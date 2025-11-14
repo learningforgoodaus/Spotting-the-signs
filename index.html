@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotting the Signs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Brand Colours: #C6B4D9, #513873, #413659, #F2F2F2, #9C7F9D */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F2F2F2; 
+            color: #413659; 
+            padding: 1rem;
+            min-height: 100vh;
+        }
+        .main-container {
+            max-width: 800px; /* INCREASED WIDTH HERE */
+            margin: 0 auto;
+        }
+        .sign-heading {
+            color: #513873; 
+            font-weight: 700;
+        }
+        .power-control-header {
+            background-color: #513873; 
+            color: #F2F2F2;
+            padding: 1.5rem; 
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .accordion-item {
+            border: 1px solid #C6B4D9; 
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 0.75rem;
+            transition: box-shadow 0.2s ease-in-out;
+        }
+        .accordion-item:hover {
+            box-shadow: 0 4px 10px rgba(81, 56, 115, 0.1);
+        }
+        .accordion-button {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            background-color: #C6B4D9; 
+            color: #413659;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .accordion-button:hover {
+            background-color: #9C7F9D; 
+        }
+        .accordion-content {
+            padding: 0 1.5rem 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-in-out;
+            background-color: #FFF;
+            border-top: 1px solid #C6B4D9;
+        }
+        .category-label {
+            background-color: #413659;
+            color: #C6B4D9;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+        .arrow-icon {
+            transition: transform 0.2s;
+        }
+        .rotated {
+            transform: rotate(180deg);
+        }
+        .content-block {
+            padding-bottom: 1.25rem;
+        }
+        .icon-container {
+            flex-shrink: 0;
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Nested Content Styling for Click-and-Reveal */
+        .nested-content {
+            transition: max-height 0.2s ease-out; /* Fast, click-and-reveal feel */
+            max-height: 0;
+            padding: 0; 
+            margin-top: 0;
+            background-color: transparent; /* Controlled by JS when open */
+            box-sizing: border-box; 
+            border-radius: 0.5rem;
+        }
+        
+        /* The inner wrapper that holds the content and padding */
+        .nested-reveal-content {
+            transition: padding 0.2s ease-out;
+            padding: 0; /* Starts with no padding */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl sign-heading mb-1 font-extrabold">
+                Spotting the Signs
+            </h1>
+            <p class="text-gray-500">Select a sign to reveal the details and club examples.</p>
+        </header>
+        
+        <!-- Power and Control Context (Static, non-interactive) -->
+        <div class="power-control-header text-center">
+            <h2 class="text-xl font-bold mb-1">The Big Picture: Power and Control</h2>
+            <p class="text-sm mt-1">All these signs are small parts of a larger plan to <strong>control</strong> another person. They are never isolated incidents.</p>
+        </div>
+
+        <div id="accordion">
+            <!-- Content will be generated here -->
+        </div>
+
+    </div>
+
+    <script>
+        const signsData = [
+            {
+                sign: "Unexplained Injuries & Hiding",
+                category: "Physical & Emotional",
+                definition: "Bruises, cuts, or physical symptoms that don't match the story, or they constantly wear concealing clothes.",
+                lookFor: "Check for injuries in non-visible areas, weak excuses like 'walking into a cupboard,' or wearing long sleeves/scarves in hot weather.",
+                clubExample: "A co-worker misses a shift with a flimsy excuse, then returns with a nasty bump on their forehead but is vague about how it happened."
+            },
+            {
+                sign: "Communication Monitoring",
+                category: "Control & Isolation",
+                definition: "Excessive calls, texts, or demands from a partner during work hours to track location and activity.",
+                lookFor: "The person is <strong>jumpy and anxious</strong> when their phone buzzes, or or they receive a constant stream of messages they rush to hide or answer.",
+                // REVISED clubExample
+                clubExample: "A bartender receives constant, non-urgent texts from their partner, checking in on their breaks, and the bartender rushes to reply, looking visibly <strong>anxious</strong> if they can't answer immediately."
+            },
+            {
+                sign: "Isolation & Withdrawal",
+                category: "Control & Isolation",
+                definition: "The person stops joining social activities, drops hobbies, or needs permission from their partner to socialize.",
+                lookFor: "Withdrawal from staff events, being cut off from family/friends, or constantly declining invitations they once enjoyed.",
+                clubExample: "Your usually social colleague used to lead staff trivia night but now says they <strong>'can't make it'</strong> because their partner wants them home straight after their shift."
+            },
+            {
+                sign: "Lack of Financial Autonomy",
+                category: "Economic Abuse",
+                definition: "The partner controls the victim's access to money, requiring them to ask for cash or account for every cent spent.",
+                lookFor: "Asking management for cash advances, mentioning they have to take photos of receipts, or relying solely on their partner for even small purchases.",
+                clubExample: "A kitchen hand has their wages deposited into a joint account, but their partner holds the only card and gives them a small <strong>'allowance'</strong> for lunch."
+            },
+            {
+                sign: "Partner Sabotage (Work)",
+                category: "Financial & Work",
+                definition: "The partner actively tries to make the victim-survivor lose their job by causing arguments, hiding keys, or damaging property before shifts.",
+                lookFor: "Repeated, pattern-based lateness or absences with strange, manufactured excuses that happen specifically on workdays.",
+                clubExample: "A loyal bartender who was never late suddenly starts missing shifts because of <strong>'car trouble'</strong> or <strong>'lost keys'</strong> multiple times in one month."
+            }
+        ];
+
+        function createSignElement(data, index) {
+            const item = document.createElement('div');
+            item.className = 'accordion-item';
+
+            const button = document.createElement('button');
+            button.className = 'accordion-button';
+            button.setAttribute('aria-expanded', 'false');
+            button.onclick = () => toggleAccordion(item, button, index);
+            
+            button.innerHTML = `
+                <span class="flex items-center">
+                    <span class="category-label">${data.category}</span>
+                    <span>${data.sign}</span>
+                </span>
+                <span class="arrow-icon transition-transform duration-200">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </span>
+            `;
+
+            const content = document.createElement('div');
+            content.className = 'accordion-content';
+            content.id = `content-${index}`;
+
+            // Icons for nested buttons
+            const iconLookFor = `<svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            const iconExample = `<svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+
+
+            // Static Definition Block
+            let innerContent = `
+                <div class="content-block pt-3 border-b border-gray-100 flex items-start pb-4">
+                    <div class="icon-container">
+                        <!-- Shield/Definition Icon -->
+                        <svg class="w-5 h-5 text-[#513873]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="font-bold text-base mb-1 text-[#513873]">What is the Sign?</p>
+                        <p>${data.definition}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Nested Item 1: What to Look For (Click-and-Reveal) - Half-width centered button, full-width revealed text.
+            innerContent += `
+                <div class="nested-block-wrapper my-3">
+                    <div class="flex justify-center w-full">
+                        <button class="nested-button w-1/2 flex items-center justify-center p-3 rounded-lg bg-[#9C7F9D] text-white font-semibold transition duration-200"
+                                data-target="nested-content-lookfor-${index}">
+                            <span class="flex items-center">
+                                <span class="mr-2">${iconLookFor}</span>
+                                <span>What to Look For?</span>
+                            </span>
+                        </button>
+                    </div>
+                    
+                    <!-- Content container is now full width -->
+                    <div id="nested-content-lookfor-${index}" class="nested-content overflow-hidden px-4"> 
+                        <!-- The inner content wrapper -->
+                        <div class="nested-reveal-content py-4 rounded-lg bg-gray-50 mt-1"> 
+                            <p>${data.lookFor}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Nested Item 2: Club/Bar Example (Click-and-Reveal) - Half-width centered button, full-width revealed text.
+            innerContent += `
+                <div class="nested-block-wrapper mb-4">
+                    <div class="flex justify-center w-full">
+                        <button class="nested-button w-1/2 flex items-center justify-center p-3 rounded-lg bg-[#9C7F9D] text-white font-semibold transition duration-200"
+                                data-target="nested-content-example-${index}">
+                            <span class="flex items-center">
+                                <span class="mr-2">${iconExample}</span>
+                                <span>Club/Bar Example</span>
+                            </span>
+                        </button>
+                    </div>
+
+                    <!-- Content container is now full width -->
+                    <div id="nested-content-example-${index}" class="nested-content overflow-hidden px-4"> 
+                        <!-- The inner content wrapper -->
+                        <div class="nested-reveal-content py-4 rounded-lg bg-gray-50 mt-1"> 
+                            <p>${data.clubExample}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = innerContent;
+
+            item.appendChild(button);
+            item.appendChild(content);
+            return item;
+        }
+
+        // Toggles the MAIN accordion item
+        function toggleAccordion(item, button, index) {
+            const content = item.querySelector('.accordion-content');
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+            const icon = item.querySelector('.arrow-icon');
+            
+            // Close all other main accordion items
+            document.querySelectorAll('.accordion-content').forEach((c, cIndex) => {
+                if (c.id !== content.id) {
+                    c.style.maxHeight = null;
+                    c.previousElementSibling.setAttribute('aria-expanded', 'false');
+                    c.previousElementSibling.querySelector('.arrow-icon').classList.remove('rotated');
+                    
+                    // Also forcefully close all nested content inside other parents
+                    c.querySelectorAll('.nested-content').forEach(nc => {
+                        nc.style.maxHeight = "0px";
+                    });
+                }
+            });
+
+            // Toggle current main item
+            if (isExpanded) {
+                content.style.maxHeight = null;
+                button.setAttribute('aria-expanded', 'false');
+                icon.classList.remove('rotated');
+                
+                // Close nested content when main parent is closed
+                content.querySelectorAll('.nested-content').forEach(nc => {
+                    nc.style.maxHeight = "0px";
+                });
+
+            } else {
+                // Open main item. 
+                // Using a slightly longer timeout to ensure content has rendered fully before calculating max-height
+                setTimeout(() => {
+                    content.style.maxHeight = content.scrollHeight + 50 + "px"; // Added buffer for safety
+                }, 100); 
+                button.setAttribute('aria-expanded', 'true');
+                icon.classList.add('rotated');
+            }
+        }
+        
+        // Toggles the NESTED click-and-reveal item
+        function toggleNestedAccordion(button) {
+            const targetId = button.getAttribute('data-target');
+            const content = document.getElementById(targetId); // The .nested-content div
+            const revealContent = content.querySelector('.nested-reveal-content'); // The div with actual text and styling
+
+            // Check if content is currently open
+            const isOpen = content.style.maxHeight !== "0px" && content.style.maxHeight !== "";
+
+            if (isOpen) {
+                // CLOSE
+                content.style.maxHeight = "0px"; // Collapse the outer container
+            } else {
+                // OPEN
+                // To prevent clipping, we ensure the inner content is fully rendered
+                // then set the outer container's maxHeight to match its scrollHeight.
+                content.style.maxHeight = revealContent.scrollHeight + "px"; // Set to inner content's height
+            }
+            
+            // Recalculate parent accordion height
+            let parentContent = button.closest('.accordion-content');
+            if (parentContent && parentContent.style.maxHeight !== "0px") {
+                // Use a slight delay to ensure the nested content's new height is factored in
+                setTimeout(() => {
+                    parentContent.style.maxHeight = parentContent.scrollHeight + 50 + "px";
+                }, 200); 
+            }
+        }
+
+
+        // Setup the initial elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const accordion = document.getElementById('accordion');
+            signsData.forEach((data, index) => {
+                accordion.appendChild(createSignElement(data, index));
+            });
+            
+            // Add global listener for nested buttons using event delegation
+            document.addEventListener('click', (event) => {
+                const button = event.target.closest('.nested-button');
+                if (button) {
+                    toggleNestedAccordion(button);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
